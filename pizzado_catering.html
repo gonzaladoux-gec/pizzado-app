@@ -30,7 +30,7 @@
   .checks label { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; cursor: pointer; line-height: 1.4; }
   .checks input[type=checkbox] { margin-top: 2px; accent-color: #d85a30; width: 15px; height: 15px; flex-shrink: 0; }
   .btn-row { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
-  .btn { padding: 10px 18px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid; transition: all 0.15s; display: flex; align-items: center; gap: 6px; flex: 1; justify-content: center; }
+  .btn { padding: 10px 18px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid; transition: all 0.15s; display: flex; align-items: center; gap: 6px; flex: 1; justify-content: center; background: #fff; }
   .btn:hover { opacity: 0.85; }
   .btn:active { transform: scale(0.98); }
   .btn-outlook { background: #eef4ff; color: #1a5fb4; border-color: #a9c2f5; }
@@ -82,7 +82,7 @@
 <div class="container">
 
   <div class="tip">
-    💡 Al hacer click en <strong>"Abrir en Outlook"</strong>, tu Outlook se abre con el mail ya redactado y dirigido al cliente. Solo tenés que hacer click en <strong>Enviar</strong>.
+    💡 Al hacer click en <strong>"Enviar por Outlook Web"</strong>, se abre Outlook en el navegador con el mail ya redactado. Solo tenés que hacer click en <strong>Enviar</strong>.
   </div>
 
   <div class="tabs">
@@ -141,7 +141,7 @@
     </div>
 
     <div class="btn-row">
-      <button class="btn btn-outlook" onclick="abrirOutlook()">📧 Abrir en Outlook</button>
+      <button class="btn btn-outlook" onclick="abrirOutlookWeb()">📧 Enviar por Outlook Web</button>
       <button class="btn btn-wpp" onclick="generarWpp()">💬 Generar WhatsApp</button>
       <button class="btn btn-save" onclick="guardarCliente(false)">💾 Solo guardar</button>
     </div>
@@ -239,12 +239,12 @@ function getDatos() {
   };
 }
 
-function abrirOutlook() {
+function abrirOutlookWeb() {
   const d = getDatos();
   if (!d.email) { showMsg('sendStatus', 'Completá el email del cliente.', 'info'); return; }
   const condiciones = getCondiciones();
-  const subject = `Confirmación de seña y condiciones del servicio — ${d.servicio}`;
-  const body = [
+  const subject = encodeURIComponent(`Confirmación de seña y condiciones del servicio — ${d.servicio}`);
+  const body = encodeURIComponent([
     `Hola ${d.nombre},`,
     ``,
     `Gracias por tu pago${d.medio ? ' mediante ' + d.medio : ''} de ${fmt(d.sena)} en concepto de seña por el servicio ${d.servicio}.`,
@@ -260,10 +260,12 @@ function abrirOutlook() {
     ...condiciones.map((c, i) => `${i + 1}. ${c}`),
     ``,
     `— Pizzado Catering`
-  ].join('\r\n');
-  window.location.href = `mailto:${d.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  ].join('\n'));
+
+  const url = `https://outlook.office.com/mail/deeplink/compose?to=${encodeURIComponent(d.email)}&subject=${subject}&body=${body}`;
+  window.open(url, '_blank');
   guardarCliente(true);
-  showMsg('sendStatus', '✓ Outlook abierto con el mail listo. Solo hacé click en Enviar.', 'ok');
+  showMsg('sendStatus', '✓ Outlook Web abierto con el mail listo. Solo hacé click en Enviar.', 'ok');
 }
 
 function generarWpp() {
