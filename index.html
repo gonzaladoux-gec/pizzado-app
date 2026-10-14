@@ -264,10 +264,7 @@ function prepararOutlook(e) {
   ].join('\n'));
 
   const url = `https://outlook.office.com/mail/deeplink/compose?to=${encodeURIComponent(d.email)}&subject=${subject}&body=${body}`;
-  document.getElementById('btnOutlook').href = url;
-  document.getElementById('btnOutlook').target = '_blank';
-  document.getElementById('btnOutlook').onclick = null;
-  document.getElementById('btnOutlook').click();
+  window.open(url, '_blank');
   guardarCliente(true);
   showMsg('sendStatus', '✓ Abriendo Outlook Web con el mail listo...', 'ok');
 }
